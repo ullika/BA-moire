@@ -16,7 +16,9 @@
 
 Meine Bachelorarbeit wird aus zwei Teilen bestehen. Das Thema sind weiterhin Moiré-Effekte beim Domain-Coloring (siehe Proposal vom 26.2.). Im ersten Teil werde ich einen Entscheidungsautomaten entwickeln, der zu gegebener Funktion $h^*: \mathbb{C} \rightarrow \mathbb{C}$ und gegebenen Pixel-Auflösungen $res_x$ und $res_y$ entscheidet, ob die Funktion angemessen darstellbar ist. Im zweiten Teil soll, falls dafür noch Zeit ist, die Entstehung der Wellenmuster erklärt werden.
 
-In der Besprechung vom 3. April ging es nur um den ersten Teil, also um die Entwicklung des Automaten. Um die Sache zu vereinfachen, nehme ich in dieser Übersicht an, dass es sich bei $h^*$ um eine Funktion auf $\mathbb{R}$ handelt und wir nur die Auflösung in x-Richtung $res_x$ betrachten müssen.
+In der Besprechung vom 3. April ging es nur um den ersten Teil, also um die Entwicklung des Automaten. Wir betrachten hier die Funktion $h^*: \mathbb{C} \rightarrow \mathbb{C}$, wobei wir $\mathbb{C}$ ohne Probleme mit dem $\mathbb{R}^2$ identifizieren können. Daher müssen wir die notwendige Auflösung in x-Richtung $res_x$ sowie in y-Richtung $res_y$ betrachten und daraus eine Auflösung $res_{max}$ berechnen, die in Richtung eines beliebigen Vektors in der $X$-$Y$-Ebene gehen kann.
+Für die Berechnung von $res_x$ und $res_y$ werden wir $h^*$ so zerlegen, dass wir zunächst für ein festes $y$ die Fourierreihe von $h^*$ aufstellen und $res_x$ in Abhängigkeit von $y$ erhalten. Dann suchen wir das $y_0$, für das $res_x$ maximal wird und haben damit eine obere Schranke für $res_x$.
+Für $res_y$ gehen wir analog vor. Die maximale Auflösung in alle Richtungen werden wir zunächst grob durch $res_{max} \leq \sqrt{2} \max \{ res_x, res_y \} $ abschätzen.
 
 Bislang steht fest \cite[vgl.][]{MuellerWichards1999}:
 
