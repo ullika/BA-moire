@@ -13,16 +13,16 @@
 \thispagestyle{empty}
 \setlength{\parskip}{6pt}
 
+Wir betrachten am Computer mit einem Domain-Coloring-Tool, z.B. JavaView, den Ausschnitt einer Funktion $$h: \mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R} \times \mathbb{R}$$
+$$h(x,y) \mapsto (c_1,c_2)$$ bei gegebenen Auflösungen $res_x$ und $res_y$  in X- bzw. Y-Richtung und wollen entscheiden, ob die Funktion angemessen darstellbar ist.
+
+Eigentlich soll JavaView ja komplexe Funktionen darstellen. Ich sehe aber keinen Grund, $\mathbb{C}$ hier nicht mit dem $\mathbb{R} \times \mathbb{R}$ zu identifizieren. \textbf{Frage Nr. 1} ist, ob ich dabei etwas übersehe.
+
 Funktionen mit hoher Frequenz müssen mit hoher Auflösung dargestellt werden, das sagt das \textbf{Abtasttheorem} \cite[nach][]{MuellerWichards1999}:
 
 \textit{Ein Zeitsignal $x(t)$, das mit $f_g$ bandbegrenzt ist und mit einer Abtastfrequenz $1/T_a \geq 2 f_g$ abgetastet wird, kann aus dem Abtastsignal [...] fehlerfrei wiedergewonnen werden.}
 
-Wir betrachten hier eine Funktion $$h: \mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R} \times \mathbb{R}$$
-$$h(x,y) \mapsto (c_1,c_2)$$ sowie gegebene Auflösungen $res_x$ und $res_y$  und wollen entscheiden, ob die Funktion angemessen darstellbar ist.
-
-Eigentlich soll JavaView ja komplexe Funktionen darstellen. Ich sehe aber keinen Grund, $\mathbb{C}$ hier nicht mit dem $\mathbb{R} \times \mathbb{R}$ zu identifizieren. \textbf{Frage Nr. 1} ist, ob ich dabei etwas übersehe.
-
-Die Funktion $h$ ist genau dann nicht angemessen darstellbar, wenn der Anteil an hohen Frequenzen groß ist, d.h. dass ein großer Fehler $\varepsilon$ übrigbleibt, wenn man nur die ersten $k$ Glieder der zweidimensionalen Fourier-Reihe $F_h(x,y)$ betrachtet. (Es wird dabei $k$ so gewählt, dass $F_{h,k}(x,y)$ gerade noch mit $f_g=\frac{1}{2T_a}$ bandbegrenzt ist).
+Die Funktion $h$ ist genau dann nicht angemessen darstellbar, wenn der Anteil an hohen Frequenzen groß ist, d.h. dass ein großer Fehler $\varepsilon$ übrigbleibt, wenn man nur die ersten $k$ Glieder ihrer zweidimensionalen Fourier-Reihe $F_h(x,y)$ betrachtet. (Es wird dabei $k$ so gewählt, dass $F_{h,k}(x,y)$ gerade noch mit $f_g=\frac{1}{2res_{min}}$ bandbegrenzt ist).
 
 Zum Restglied von mehrdimensionalen Fourier-Reihen (d.h. nicht von $\mathbb{R}$ nach $\mathbb{R} \times \mathbb{R}$, sondern von $\mathbb{R} \times \mathbb{R}$ nach $\mathbb{R} \times \mathbb{R}$) sind kaum Abschätzungen zu finden. Oder, das wäre \textbf{Frage Nr. 2}, sind Ihnen welche bekannt?
 
@@ -30,17 +30,17 @@ Konstantin hat mich auf die Idee gebracht, stattdessen zunächst die Variable $y
 
 \textbf{Frage Nr. 3} Was halten Sie von diesem Vorgehen? Sind die Abschätzungen, die wir so bekommen, zu grob, so dass wir zu viele korrekt darstellbare Funktionen verlieren? Welche Funktion hat mein Entscheidungsautomat überhaupt, findet er irgendwo praktische Anwendung? Wenn ja, worauf muss ich dabei achten?
 
-\textbf{Frage Nr. 4} Gilt $\varepsilon=\max \{ \varepsilon_x, \varepsilon_y \}$?
+\textbf{Frage Nr. 4} Gilt $\varepsilon=\max \{ \varepsilon_x, \varepsilon_y \}$? Ich denke nicht, da die Auflösung entlang der Hauptdiagonalen um den Faktor $\frac{1}{\sqrt{2}}$ kleiner ist, als die Auflösung entlang der Achsen. Wenn man aber vor der Rechnung $res_{min}=\min \{ res_x, res_y \}$ mit diesem Faktor skaliert, müsste die Rechnung stimmen. Oder?
 
-\textbf{Frage Nr. 5} Was könnte man tun, wenn $h$ eine Funktion ist, die zum Beispiel Unstetigkeitsstellen hat und daher durch eine Fourier-Reihe gar nicht gleichmäßig approximierbar ist?
+\textbf{Frage Nr. 5} Was könnte man tun, wenn $h$ eine Funktion ist, die zum Beispiel Unstetigkeitsstellen hat und daher durch eine Fourier-Reihe gar nicht gleichmäßig approximierbar ist? Ist das überhaupt ein Problem? Man könnte trotzdem die Fourierreihe bis zum $k$-ten Glied aufstellen und den Fehler betrachten.
 
-\textbf{Frage Nr. 6} Wie soll der Computer feststellen, ob die Fourier-Reihe gleichmäßig konvergiert? Ich denke, dass es ist nicht so einfach ist, automatisch Stetigkeit oder sogar Differenzierbarkeit zu überprüfen. 
+\textbf{Frage Nr. 6} (Nur, falls es doch ein Problem ist: Wie soll der Computer feststellen, ob die Funktion gleichmäßig approximierbar ist, d.h. ob die Fourier-Reihe gleichmäßig konvergiert? Ich denke, dass es ist nicht so einfach ist, automatisch Stetigkeit oder sogar Differenzierbarkeit zu überprüfen.)
 
-\textbf{Frage Nr. 7} Angenommen, die Fourier-Reihe von $h_y(x)$ konvergiert gleichmäßig gegen die Funktion. Was ist eine gute Abschätzung für das Restglied bzgl. der Maximumsnorm? Überall finde ich nur Aussagen über die Konvergenzgeschwindigkeit, aber nichts über den konkreten Wert des Restglieds.
+\textbf{Frage Nr. 7} Was ist eine gute Abschätzung für das Restglied bzgl. der Maximumsnorm? Überall finde ich nur Aussagen über die Konvergenzgeschwindigkeit, aber nichts über den konkreten Wert des Restglieds.
 
-\textbf{Frage Nr. 8} Wenn ich einen Filter implementiere, muss ich die Fourier-Reihe konkret berechnen können. Dazu muss ich integrieren. Auch das ist am Computer nicht so leicht. Oder stellt das srcBase-Paket etwas zur Verfügung?
+\textbf{Frage Nr. 8} Wenn ich einen Filter implementiere, muss dieser für jede Funktion die Fourier-Reihe aufstellen können. Für die Berechnung der Koeffizienten ist Integration notwendig. Stellt das srcBase-Paket dafür etwas zur Verfügung? Oder soll ich mich mit numerischer Integration auseinandersetzen und selbst ein Verfahren programmieren?
 
-\textbf{Frage Nr. 9} Soll der Filter bei JavaView oder im ImageSource-Applet oder in beidem eingesetzt werden?
+\textbf{Frage Nr. 9} Soll der Filter später bei JavaView oder im ImageSource-Applet oder in beidem eingesetzt werden? (Bei JavaView kann ich gerade den Zoom nicht benutzen, aber das bespreche ich mit Konstantin.)
 
 \bibliography{lit}
 \bibliographystyle{alpha}
