@@ -1,13 +1,12 @@
 import sun.awt.image.codec.JPEGParam;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,84 +14,55 @@ import java.awt.event.ComponentListener;
  * Date: 6/28/14
  * Time: 2:19 PM
  */
-public class SPanel extends JPanel {
+public class SPanel extends JPanel implements ActionListener {
     static final int MINDIST = 1;
     static final int MAXDIST = 100;
+    JFrame frame;
     DrawingArea drawingArea;
-    int nLayers = 2;
-    JSlider[] distsliders;
-    JSlider[] phisliders;
-    int counter=0;
+    JPanel toolpanel;
+    JPanel surrounder;
+    JPanel surrounder2;
+    int nLayers;
+    ArrayList <Toolbox> toolboxes;
+
+    private LayerPropertyTable table;
+
+    public void setTable(LayerPropertyTable table) {
+        this.table = table;
+    }
 
     SPanel(JFrame frame) {
         super();
-        frame.add(this);
+        this.frame=frame;
+
         this.setLayout(new BorderLayout());
-        JPanel toolpanel = new JPanel();
-        toolpanel.setLayout(new BoxLayout(toolpanel,BoxLayout.PAGE_AXIS));
+        toolpanel = new JPanel();
 
-        nLayers=Integer.parseInt(JOptionPane.showInputDialog("wieviele layer?"));
-        distsliders = new JSlider[nLayers];
-        phisliders = new JSlider[nLayers];
+        BoxLayout boxLayout = new BoxLayout(toolpanel, BoxLayout.PAGE_AXIS);
 
-        for (int i = 0; i < nLayers; i++) {
-            distsliders[i] = new JSlider(MINDIST, MAXDIST, 20);
-            distsliders[i].addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
+        toolpanel.setLayout(boxLayout);
+        nLayers=0;
+        toolboxes = new ArrayList<Toolbox>();
 
-                    Object source = e.getSource();
-                    JSlider slider = (JSlider) source;
-                    if (!slider.getValueIsAdjusting()) {
-
-                        drawingArea.repaint();
-                    }
-                }
-            });
-            ;
-        }
-        for (int i = 0; i < nLayers; i++) {
-            phisliders[i] = new JSlider(0, (int) (100 * Math.PI / 2), 0);
-            phisliders[i].addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-
-                    Object source = e.getSource();
-                    JSlider slider = (JSlider) source;
-                    if (!slider.getValueIsAdjusting()) {
-
-                        drawingArea.repaint();
-                    }
-                }
-            });
-            ;
-        }
-
-        for (int i = 0; i < nLayers; i++) {
-            toolpanel.add(new JLabel("GRID No. " + (i + 1)));
-            toolpanel.add(new JLabel("..."));
-
-            toolpanel.add(new JLabel("Number of Lines"));
-            toolpanel.add(distsliders[i]);
-
-            toolpanel.add(new JLabel(("Phi")));
-            toolpanel.add(phisliders[i]);
-        }
+        JButton newLayerButton = new JButton("New Layer");
+        newLayerButton.setActionCommand("NEW_LAYER");
+        newLayerButton.addActionListener(this);
+        toolpanel.add(newLayerButton);
 
         System.out.println(toolpanel.getLayout().toString());
 
-        JPanel surrounder2 = new JPanel();
+
+        surrounder2 = new JPanel();
         surrounder2.add(toolpanel);
-        this.add(surrounder2,BorderLayout.NORTH);
 
         drawingArea = new DrawingArea(this);
-        JPanel surrounder = new JPanel();
+        surrounder = new JPanel();
 
         surrounder.setLayout(null);
         surrounder.setPreferredSize(new Dimension(400,400));
         surrounder.add(drawingArea);
 
-        surrounder.addComponentListener(new ComponentListener() {
+        surrounder.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
 
@@ -112,33 +82,52 @@ public class SPanel extends JPanel {
                 System.out.println("drawing area size: " + drawingArea.getSize().toString());
                 System.out.println("position: " + drawingArea.getX() + " / " + drawingArea.getY());
 
-                counter++;
-                System.out.println("counter: "+counter);
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-
-            }
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e) {
 
             }
         });
 
-        this.add(surrounder, BorderLayout.CENTER);
 
     }
 
-    public int getnLayers() {
-        return nLayers;
+    void createNewLayer() {
+
+        final Toolbox box=new Toolbox(this,new Layer(nLayers));
+        toolboxes.add(box);
+        nLayers++;
+        toolpanel.add(box);
+        toolpanel.setVisible(false);
+        toolpanel.setVisible(true);
+        update();
+        this.frame.pack();
+
     }
 
+    public void update() {
+        drawingArea.repaint();
+        table.update();
+    }
 
+    @Override
+    public void actionPerformed(ActionEvent e) {
+            if (e.getActionCommand().equals("NEW_LAYER")) {
+            createNewLayer();
+        }
+
+
+
+    }
+
+    public void removeLayer(Layer layer) {
+        for (int i = 0; i < toolboxes.size(); i++) {
+            if (toolboxes.get(i).layer==layer)  {
+                toolboxes.remove(i);
+                toolpanel.remove(i+1);
+            }
+        }
+        toolpanel.invalidate();
+        toolpanel.revalidate();
+        update();
+        frame.pack();
+
+    }
 }
