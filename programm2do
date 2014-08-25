@@ -1,0 +1,12 @@
+2do:
+
+evtl. gitter zentrieren
+evtl. verschiebung für kreise einbauen
+punkte kriegen bei einem schlechten verhältnis von distance und strokewidth komisches muster bzw wird alles schwarz. lsg: strokewith relativ nicht absolut definieren.
+ist jetzt halb gemacht aber sieht immer noch hässlich aus, mathematisch unpräzise, alles doof.
+
+tabelle in der die werte drinstehen. problem: momentan nur die werte der slider, soll aber konkrete pixelwerte liefern.
+beim punktgitter funktioniert die zentrierung nicht (siehe screenshot)
+scherung
+spektrum incl. visibility circle
+
