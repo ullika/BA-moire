@@ -16,6 +16,9 @@ import java.awt.event.ItemListener;
 public class Toolbox extends JPanel {
     Layer layer;
     SPanel sPanel;
+
+
+
     Toolbox(SPanel spanel, Layer layer) {
         this.sPanel = spanel;
         this.layer = layer;
@@ -35,50 +38,45 @@ public class Toolbox extends JPanel {
         add(visibleBox);
 
 
-
-
-        String[] types={"lines", "dots"};
-
-        typeBox=new JComboBox(types);
+        typeBox=new JComboBox(Layer.Type.values());
         typeBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                layer.setType((String) typeBox.getSelectedItem());
+                layer.setType((Layer.Type) typeBox.getSelectedItem());
                 sPanel.update();
             }
         });
 
         add(typeBox);
 
-        String[] figures = {"straight", "circle", "parabola"};
 
-        figureBox=new JComboBox(figures);
+        figureBox=new JComboBox(Layer.Figure.values());
         figureBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parabolaSlider.setEnabled(figureBox.getSelectedItem().equals("parabola"));
-                layer.setFigure((String) figureBox.getSelectedItem());
+                parabolaSlider.setEnabled(figureBox.getSelectedItem()==Layer.Figure.PARABOLA);
+                layer.setFigure((Layer.Figure) figureBox.getSelectedItem());
                 sPanel.update();
             }
         });
         add(figureBox);
 
-        distslider=new JSlider(1, 100, 15);
+        densitySlider =new JSlider(1, 100, 15);
 
-        distslider.addChangeListener(new ChangeListener() {
+        densitySlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
 
-                if (!distslider.getValueIsAdjusting()) {
-                    layer.setDistance(distslider.getValue());
+                if (!densitySlider.getValueIsAdjusting()) {
+                    layer.setNLines(densitySlider.getValue());
                     sPanel.update();
                 }
             }
         });
         ;
-        distslider.setPreferredSize(new Dimension(100, (int) distslider.getPreferredSize().getHeight()));
-        add(new JLabel("Distance:"));
-        add(distslider);
+        densitySlider.setPreferredSize(new Dimension(100, (int) densitySlider.getPreferredSize().getHeight()));
+        add(new JLabel("Density:"));
+        add(densitySlider);
 
         phislider=new JSlider(0, (int) (100 * Math.PI), 0);
         phislider.addChangeListener(new ChangeListener() {
@@ -96,19 +94,19 @@ public class Toolbox extends JPanel {
         phislider.setPreferredSize(new Dimension(100, (int) phislider.getPreferredSize().getHeight()));
         add(phislider);
 
-        strokeslider = new JSlider(0, 90, 10);
+        strokeslider = new JSlider(0, 100, 10);
         strokeslider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
 
                 if (!strokeslider.getValueIsAdjusting()) {
-                    layer.setStrokewidth(strokeslider.getValue());
+                    layer.setOpeningRatio(strokeslider.getValue());
                     sPanel.update();
                 }
             }
         });
 
-        add(new JLabel("Strokewidth:"));
+        add(new JLabel("Opening Ratio:"));
         strokeslider.setPreferredSize(new Dimension(100, strokeslider.getPreferredSize().height));
         add(strokeslider);
 
@@ -145,7 +143,7 @@ public class Toolbox extends JPanel {
     JComboBox figureBox;
     JComboBox typeBox;
     JSlider phislider;
-    JSlider distslider;
+    JSlider densitySlider;
     JSlider strokeslider;
     JSlider parabolaSlider;
     JCheckBox visibleBox;

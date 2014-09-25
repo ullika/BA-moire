@@ -14,18 +14,17 @@ import java.util.ArrayList;
  * Date: 6/28/14
  * Time: 2:19 PM
  */
-public class SPanel extends JPanel implements ActionListener {
-    static final int MINDIST = 1;
-    static final int MAXDIST = 100;
+public class SPanel extends JPanel {
     JFrame frame;
     DrawingArea drawingArea;
     JPanel toolpanel;
     JPanel surrounder;
     JPanel surrounder2;
     int nLayers;
-    ArrayList <Toolbox> toolboxes;
+    ArrayList<Toolbox> toolboxes;
 
     private LayerPropertyTable table;
+    private SpectrumPanel spectrumPanel;
 
     public void setTable(LayerPropertyTable table) {
         this.table = table;
@@ -33,7 +32,7 @@ public class SPanel extends JPanel implements ActionListener {
 
     SPanel(JFrame frame) {
         super();
-        this.frame=frame;
+        this.frame = frame;
 
         this.setLayout(new BorderLayout());
         toolpanel = new JPanel();
@@ -41,12 +40,17 @@ public class SPanel extends JPanel implements ActionListener {
         BoxLayout boxLayout = new BoxLayout(toolpanel, BoxLayout.PAGE_AXIS);
 
         toolpanel.setLayout(boxLayout);
-        nLayers=0;
+        nLayers = 0;
         toolboxes = new ArrayList<Toolbox>();
 
         JButton newLayerButton = new JButton("New Layer");
-        newLayerButton.setActionCommand("NEW_LAYER");
-        newLayerButton.addActionListener(this);
+
+        newLayerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                createNewLayer();
+            }
+        });
         toolpanel.add(newLayerButton);
 
         System.out.println(toolpanel.getLayout().toString());
@@ -59,7 +63,7 @@ public class SPanel extends JPanel implements ActionListener {
         surrounder = new JPanel();
 
         surrounder.setLayout(null);
-        surrounder.setPreferredSize(new Dimension(400,400));
+        surrounder.setPreferredSize(new Dimension(400, 400));
         surrounder.add(drawingArea);
 
         surrounder.addComponentListener(new ComponentAdapter() {
@@ -79,8 +83,6 @@ public class SPanel extends JPanel implements ActionListener {
 
                 drawingArea.setLocation(x, y);
 
-                System.out.println("drawing area size: " + drawingArea.getSize().toString());
-                System.out.println("position: " + drawingArea.getX() + " / " + drawingArea.getY());
 
 
             }
@@ -91,7 +93,7 @@ public class SPanel extends JPanel implements ActionListener {
 
     void createNewLayer() {
 
-        final Toolbox box=new Toolbox(this,new Layer(nLayers));
+        final Toolbox box = new Toolbox(this, new Layer(nLayers));
         toolboxes.add(box);
         nLayers++;
         toolpanel.add(box);
@@ -104,24 +106,15 @@ public class SPanel extends JPanel implements ActionListener {
 
     public void update() {
         drawingArea.repaint();
-        table.update();
+        updateData();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-            if (e.getActionCommand().equals("NEW_LAYER")) {
-            createNewLayer();
-        }
-
-
-
-    }
 
     public void removeLayer(Layer layer) {
         for (int i = 0; i < toolboxes.size(); i++) {
-            if (toolboxes.get(i).layer==layer)  {
+            if (toolboxes.get(i).layer == layer) {
                 toolboxes.remove(i);
-                toolpanel.remove(i+1);
+                toolpanel.remove(i + 1);
             }
         }
         toolpanel.invalidate();
@@ -129,5 +122,19 @@ public class SPanel extends JPanel implements ActionListener {
         update();
         frame.pack();
 
+    }
+
+    public void updateData() {
+        if (table != null)  {
+            table.update();
+
+        }
+        if (spectrumPanel!=null) {
+            spectrumPanel.repaint();
+        }
+    }
+
+    public void setSpectrumPanel(SpectrumPanel spectrumPanel) {
+        this.spectrumPanel = spectrumPanel;
     }
 }

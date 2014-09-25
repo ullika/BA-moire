@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 /**
@@ -19,6 +21,7 @@ public class LayerPropertyTable extends JTable {
         createColumns();
         dataModel = new PropertyTableModel();
         setModel(dataModel);
+
     }
 
     public void update() {
@@ -50,23 +53,29 @@ public class LayerPropertyTable extends JTable {
         });
 
 
-        columns.add(new Column("Distance",Integer.class) {
+        columns.add(new Column("Gap",String.class) {
             @Override
             Object getValue(Layer layer) {
-                return layer.getDistance();
+                return layer.getGap()+"px";
             }
         });
-        columns.add(new Column("Rotation",Integer.class) {
+        columns.add(new Column("Rotation",String.class) {
+
+
+
             @Override
             Object getValue(Layer layer) {
-                return layer.getPhi();
+                double degree=layer.getPhi()*1.8/Math.PI;
+                NumberFormat format= NumberFormat.getNumberInstance();
+                format.setMaximumFractionDigits(2);
+                return(format.format(degree)+"°");
             }
 
         });
-        columns.add(new Column("Strokewidth",Integer.class) {
+        columns.add(new Column("Strokewidth",String.class) {
             @Override
             Object getValue(Layer layer) {
-                return layer.getStrokewidth();
+                return layer.getStrokewidth()+"px";
             }
 
         });
@@ -122,7 +131,7 @@ public class LayerPropertyTable extends JTable {
     public abstract static class Column {
 
         private String name;
-        private TableCellRenderer renderer;
+
         private Class type;
 
         abstract Object getValue(Layer layer);
@@ -130,14 +139,10 @@ public class LayerPropertyTable extends JTable {
         protected Column(String name, Class type) {
             this.name = name;
             this.type = type;
-            this.renderer = new DefaultTableCellRenderer();
+
         }
 
-        protected Column(String name, TableCellRenderer renderer, Class type) {
-            this.name = name;
-            this.renderer = renderer;
-            this.type = type;
-        }
+
     }
 
 

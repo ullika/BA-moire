@@ -21,7 +21,7 @@ public class MainClass {
 
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
         try {
-            UIManager.setLookAndFeel(new WindowsLookAndFeel());
+            UIManager.setLookAndFeel(new WindowsClassicLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
@@ -52,6 +52,15 @@ public class MainClass {
         tableFrame.pack();
         tableFrame.setVisible(true);
         sPanel.setTable(table);
+
+        JFrame spectrumFrame=new JFrame();
+        SpectrumPanel spectrumPanel=new SpectrumPanel(sPanel);
+        spectrumFrame.getContentPane().add(spectrumPanel);
+        spectrumFrame.setSize(400,400);
+        spectrumFrame.setLocation(400,400);
+        spectrumFrame.setVisible(true);
+        spectrumFrame.setResizable(false);
+        sPanel.setSpectrumPanel(spectrumPanel);
 
     }
 }

@@ -7,41 +7,97 @@
 
 \begin{document}
 
-\title{Fragen}
+\title{Moire-Effekte in der Visualisierung}
 \date{}
 \maketitle
 \thispagestyle{empty}
 \setlength{\parskip}{6pt}
 
-Wir betrachten am Computer mit einem Domain-Coloring-Tool, z.B. JavaView, den Ausschnitt einer Funktion $$h: \mathbb{R} \times \mathbb{R} \rightarrow \mathbb{R} \times \mathbb{R}$$
-$$h(x,y) \mapsto (c_1,c_2)$$ bei gegebenen Auflösungen $res_x$ und $res_y$  in X- bzw. Y-Richtung und wollen entscheiden, ob die Funktion angemessen darstellbar ist.
+Einleitung
 
-Eigentlich soll JavaView ja komplexe Funktionen darstellen. Ich sehe aber keinen Grund, $\mathbb{C}$ hier nicht mit dem $\mathbb{R} \times \mathbb{R}$ zu identifizieren. \textbf{Frage Nr. 1} ist, ob ich dabei etwas übersehe.
+Moiré-Effekte sind an vielen Stellen im Alltag zu beobachten. Sie entstehen, wenn zwei oder mehr sich wiederholende Strukturen (wie Gitter oder Raster) übereinandergelegt oder gegeneinander betrachtet werden.  
+Auch in der Visualisierung von mathematischen Funktionen treten Moiré-Effekte an verschiedenen Stellen auf.
+Der Effekt entsteht durch eine Interaktion der übereinandergelegten Strukturen: Dort, wo sich die dunklen Stellen der ursprünglichen Strukturen überlagern, scheint es heller zu sein als dort wo die dunklen Stellen nebeneinander auftreten und so mehr Raum einnehmen (siehe Grafik).
+In dieser Bachelorarbeit wird ein mathematisches Modell vorgestellt, mit dem sich Moiré-Effekte vorhersagen und klassifizieren lassen. Dabei werde ich vor allem nach Isaac Amidrors Buch “The Theory of the Moiré Phenomenon” vorgehen, in dem dieser “spektrale Ansatz” ausführlich besprochen wird.
+Zu Beginn werde ich einige wichtige Resultate aus der Fourier-Theorie vorstellen, ohne die der “spektrale Ansatz” nicht auskommt. Mein Fokus soll allerdings woanders liegen, also wird dieser Teil recht kurz ausfallen. Danach möchte ich einige Moirés vorstellen und mit dem “spektralen Ansatz” analysieren, dabei wird mein Programm zum Einsatz kommen, mit dem auf einfache Weise Gitter und Raster übereinandergelegt und gegeneinander verdreht werden können.
+Am Schluss wird es noch einen Ausblick auf all das geben, wofür jetzt keine Zeit oder kein Platz mehr ist.
 
-Funktionen mit hoher Frequenz müssen mit hoher Auflösung dargestellt werden, das sagt das \textbf{Abtasttheorem} \cite[nach][]{MuellerWichards1999}:
+Fourier-Theorie
 
-\textit{Ein Zeitsignal $x(t)$, das mit $f_g$ bandbegrenzt ist und mit einer Abtastfrequenz $1/T_a \geq 2 f_g$ abgetastet wird, kann aus dem Abtastsignal [...] fehlerfrei wiedergewonnen werden.}
+Für eine reellwertige periodische Funktion $g(x)$ mit Periode $T$ existiert eine Reihenentwicklung, ähnlich der Taylor-Reihenentwicklung, nur dass die Summanden hier keine Polynome sondern Sinus- oder Kosinus-Funktionen sind. D.h. $g(x)$ ist unter guten Umständen darstellbar als:
 
-Die Funktion $h$ ist genau dann nicht angemessen darstellbar, wenn der Anteil an hohen Frequenzen groß ist, d.h. dass ein großer Fehler $\varepsilon$ übrigbleibt, wenn man nur die ersten $k$ Glieder ihrer zweidimensionalen Fourier-Reihe $F_h(x,y)$ betrachtet. (Es wird dabei $k$ so gewählt, dass $F_{h,k}(x,y)$ gerade noch mit $f_g=\frac{1}{2res_{min}}$ bandbegrenzt ist).
+$$ a_0+\sum\limits_{1}^{\infty}(a_n \cos 2\pi nfx + b_n \sin 2\pi nfx)$$
+wobei
+$$ a_0=1/T \int\limits_{-\frac{1}{2}T}^{\frac{1}{2}T}g(x)dx$$
+$$ a_n=2/T \int\limits_{-\frac{1}{2}T}^{\frac{1}{2}T}g(x) \cos 2\pi nfx dx$$
+$$ b_n=2/T \int\limits_{-\frac{1}{2}T}^{\frac{1}{2}T}g(x) \sin 2\pi nfx dx$$. %ACHTUNG, IM BUCH OHNE N HIER. NACHGUCKEN!
 
-Zum Restglied von mehrdimensionalen Fourier-Reihen (d.h. nicht von $\mathbb{R}$ nach $\mathbb{R} \times \mathbb{R}$, sondern von $\mathbb{R} \times \mathbb{R}$ nach $\mathbb{R} \times \mathbb{R}$) sind kaum Abschätzungen zu finden. Oder, das wäre \textbf{Frage Nr. 2}, sind Ihnen welche bekannt?
+Eine Verallgemeinerung der Reihenentwicklung stellt die Fouriertransformation dar, die auch aperiodische Funktionen in ihre (überabzählbar vielen) periodischen Anteile zu zerlegen vermag. Führen wir die Fouriertransformation einer Funktion $f(x,y)$ durch, so erhalten wir eine zweite, neue Funktion $F(u,v)$, die das Frequenzspektrum von $f$ beschreibt. Für den Spezialfall, das $f$ periodisch ist, ist $F$ an den meisten Stellen gleich Null und hat nur einzelne, unendlich schmale und unendlich hohe Impulse, die den Summanden in der Fourier-Reihenentwicklung entsprechen. Eine solche Funktion nennen wir Impulsbett.
 
-Konstantin hat mich auf die Idee gebracht, stattdessen zunächst die Variable $y$ festzuhalten, dann die Fourier-Reihe der Funktion $h_{y}(x): \mathbb{R} \rightarrow \mathbb{R} \times \mathbb{R}$ aufzustellen und dort den Fehler $\varepsilon_x(y)$ in Abhängigkeit von $y$ zu berechnen. Da wir in JavaView immer nur einen Ausschnitt der Funktion betrachten können wir das Maximum von $\varepsilon_x(y)$ über alle $y$ bestimmen und so zu einem maximalen Fehler $\varepsilon_x=\max_y \{ \varepsilon_x(y) \}$ kommen. Analog gehen wir vor, um $\varepsilon_y$ zu bestimmen.
+Die Fourier-Transformation von $f(x,y)$ ist definiert durch $$\int\limits_{-\infty}^{\infty}\int\limits_{-\infty}^{\infty}f(x,y)e^{-i2\pi (ux+vy)}dxdy.$$
 
-\textbf{Frage Nr. 3} Was halten Sie von diesem Vorgehen? Sind die Abschätzungen, die wir so bekommen, zu grob, so dass wir zu viele korrekt darstellbare Funktionen verlieren? Welche Funktion hat mein Entscheidungsautomat überhaupt, findet er irgendwo praktische Anwendung? Wenn ja, worauf muss ich dabei achten?
+Dieses Integral, welches eine Funktion von $u$ und $v$ ist, schreiben wir $F(u,v)$. Bemerkung: Die Fouriertransformation einer achsensymmetrischen und reellwertigen Funktion ist wiederum achsensymmetrisch und reellwertig.
 
-\textbf{Frage Nr. 4} Gilt $\varepsilon=\max \{ \varepsilon_x, \varepsilon_y \}$? Ich denke nicht, da die Auflösung entlang der Hauptdiagonalen um den Faktor $\frac{1}{\sqrt{2}}$ kleiner ist, als die Auflösung entlang der Achsen. Wenn man aber vor der Rechnung $res_{min}=\min \{ res_x, res_y \}$ mit diesem Faktor skaliert, müsste die Rechnung stimmen. Oder?
+Die Konvolution oder Faltung zweier Funktionen $f(x)$ und $g(x)$ ist $$\int\limits_{-\infty}^{\infty}f(u)g(x-u)du$$ oder kurz $$f(x) * g(x)$$
 
-\textbf{Frage Nr. 5} Was könnte man tun, wenn $h$ eine Funktion ist, die zum Beispiel Unstetigkeitsstellen hat und daher durch eine Fourier-Reihe gar nicht gleichmäßig approximierbar ist? Ist das überhaupt ein Problem? Man könnte trotzdem die Fourierreihe bis zum $k$-ten Glied aufstellen und den Fehler betrachten.
 
-\textbf{Frage Nr. 6} (Nur, falls es doch ein Problem ist: Wie soll der Computer feststellen, ob die Funktion gleichmäßig approximierbar ist, d.h. ob die Fourier-Reihe gleichmäßig konvergiert? Ich denke, dass es ist nicht so einfach ist, automatisch Stetigkeit oder sogar Differenzierbarkeit zu überprüfen.)
+Wenn man zwei Funktionen miteinander multipliziert, und dann das Spektrum betrachtet, kann man genauso gut die beiden Spektren miteinander falten. Das geht so: 
 
-\textbf{Frage Nr. 7} Was ist eine gute Abschätzung für das Restglied bzgl. der Maximumsnorm? Überall finde ich nur Aussagen über die Konvergenzgeschwindigkeit, aber nichts über den konkreten Wert des Restglieds.
+Abtastung. Wenn man eine Funktion mit einem Dirac-Impuls multipliziert, erhält man eine Kopie der Funktion. Wenn man sie allerdings mit einem Dirac-Impuls (oder besser einem ganzen Dirac-Kamm) faltet, bekommt man eine Abtastung!!
+Das wird später wichtig sein, wenn wir über Moiré als Abtastphänomen reden und den “spektralen Ansatz” dafür nutzbar machen werden, ärgerliche Effekte bei zu geringer Pixelauflösung in der Visualisierung zu erklären.
 
-\textbf{Frage Nr. 8} Wenn ich einen Filter implementiere, muss dieser für jede Funktion die Fourier-Reihe aufstellen können. Für die Berechnung der Koeffizienten ist Integration notwendig. Stellt das srcBase-Paket dafür etwas zur Verfügung? Oder soll ich mich mit numerischer Integration auseinandersetzen und selbst ein Verfahren programmieren?
+Der spektrale Ansatz
 
-\textbf{Frage Nr. 9} Soll der Filter später bei JavaView oder im ImageSource-Applet oder in beidem eingesetzt werden? (Bei JavaView kann ich gerade den Zoom nicht benutzen, aber das bespreche ich mit Konstantin.)
+Wir werden uns hier mit zweidimensionalen Strukturen in der x-y-Ebene beschäftigen, die wir Bilder nennen. Ihre zugehörigen Frequenzspektra bekommen wir über die Fouriertransformation.
+In dieser Bachelorarbeit werden nur einfarbige Strukturen besprochen, daher können wir jedes Bild über seine Reflektionsfunktion beschreiben, welche jedem Punkt (x,y) einen Wert zwischen 0 und 1 entsprechend seiner Lichtreflexion zuordnen. Dabei entpricht der Wert 0 der Farbe schwarz (keine Lichtreflexion) und der Wert 1 der Farbe weiß (volle Reflexion) und Werte dazwischen entsprechen verschiedenen Schattierungen. Das Übereinanderlegen solcher Bilder kann durch eine Multiplikation der Reflexionsfunktionen modelliert werden: Zwei schwarze Bereiche übereinander ergeben wieder einen schwarzen Bereich, zwei weiße einen weißen, ein schwarzer und ein weißer einen schwarzen usw.
+Bei einer Übereinanderlegung von $m$ Gittern ist die Reflektionsfunktion des resultierenden Bildes also das Produkt der einzelnen Reflektionsfunktionen:
+$$r(x,y)=r_1(x,y)\cdot \ldots \cdot r_m(x,y)$$
+
+Nach dem Konvolutionstheorem erhalten wir das Spektrum des resultierenden Bildes durch eine Faltung der einzelnen Spektra:
+$$R(u,v)=R_1(u,v)\cdot \ldots \cdot R_m(u,v)$$
+
+Da in dieser Arbeit nur periodische Strukturen untersucht werden, ist das Spektrum in der $u,v$-Ebene nicht glatt, sondern besteht aus einzelnen Impulsen (siehe oben). Jeder dieser Impulse im 2D-Spektrum kann durch drei charakteristische Eigenschaften beschrieben werden: Seinen Index in der Fourier-Reihenentwicklung, seine geometrischen Lage in der $(u,v)$-Ebene, gegeben durch den sog. Frequenzvektor $f$, und seine Amplitude.
+Ich werde in dieser Bachelorarbeit, genau wie Amidror in den ersten Kapiteln seines Buches, davon ausgehen, dass die Bilder (und damit auch die Bildüberlagerungen) achsensymmetrisch und am Ursprung zentriert sind, daher werden auch die Frequenzspektra reellwertig und achsensymmetrisch sein (siehe Bemerkung oben). Das heißt, dass jedem Impuls im Spektrum (außer dem Impuls im Ursprung) ein zweiter gegenüberliegt, der die gleiche Amplitude und den Frequenzvektor $-f)$ hat.
+
+Ob ein Impulspaar im Spektrum eine sichtbare periodische Komponente repräsentiert, hängt mit der menschlichen Sehfähigkeit zusammen. Das menschliche Auge kann kleine Details oberhalb einer gewissen Frequenz nicht mehr erkennen. Der Bereich der Frequenzen, die der Mensch als periodische Strukturen zu erkennen vermag, kann im Spektrum daher als ein Ring um den Ursprung dargestellt werden, den sogenannten \textit{visibility circle} (hier übernehme ich die Bezeichnung von Amidror). Da bei zu großen Frequenzen der Mensch auch nicht mehr imstande ist, die periodische Struktur wahrzunehmen, hat der \textit{visibility circle} eigentlich ein Loch in der Mitte, ist also ein Ring.
+
+Natürlich ist dieser \textit{visibility circle} nur ein Konstrukt, der auf Durchschnittswerten beruht. Die Fähigkeit, eine Struktur zu erkennen, ist von vielen Faktoren abhängig, zum Beispiel von den Lichtverhältnissen und dem persönlichen "Training" des Betrachters.
+
+Binäre Gitter
+
+Hier werden binäre (0,1-wertige) Liniengitter übereinandergelegt, d.h. die Reflexionsfunktionen $r(x,y)$ der Bilder sind binäre Rechteckwellen. Beachte, dass ein 2D-Liniengitter nur eine eindimensionale periodische Funktion ist, die rechtwinklig zu ihrer Hauptrichtung konstant ist.
+Wir gehen hier davon aus, dass $r_1(x,y)$ symmetrisch zur y-Achse ist. Die Reflexionsfunktion eines solchen Liniengitters mit Periode $T_1$ in x-Richtung ist gegeben durch die Fourier-Reihenentwicklung:
+$$r_1(x,y)=\sum\limits_{-\infty}^{\infty}a^{(1)}_n\cos(2\pi nx/T_1)$$
+Die Reflexionsfunktion eines um $\Theta_2$ gedrehten Liniengitters mit Periode $T_2$ ist gegeben durch
+$$r_2(x,y)=\sum\limits_{-\infty}^{\infty}a^{(2)}_n\cos(2 \pi n[x\cos \Theta_2 + y \sin \Theta_2]/T_2)$$,
+wobei $a^{(1)}_n$ und $a^{(2)_n}$ die Koeffizienten der Fourier-Reihenentwicklung sind (zur Berechnung, siehe oben).
+Die Fouriertransformierte $R_1(u,v)$ der Reflexionsfunktion $r_1$ ist ein symmetrischer Impulskamm auf der $u$-Achse. Die Intervalle zwischen den Impulsen betragen $1/T_1$ und ihre Amplituden sind $a^{(1)}_n$. Die Fouriertransformierte $R_2(u,v)$ der Reflexionsfunktion $r_2$ ist ebenfalls ein Impulskamm, der allerdings um den Winkel $\Theta$ um den Ursprung gedreht ist.
+
+Betrachten wir nun die Überlagerung zweier Liniengitter, $r(x,y)=r_1(x,y)r_2(x,y)$, so ist das Spektrum des Resultats nach dem Konvolutionstheorem durch die Faltung der beiden Spektren $R_1(u,v)$ und $R_2(u,v)$ gegeben. Nach der "move-and-multiply"-Methode, die oben vorgestellt wurde, können wir uns die Faltung so vorstellen: Über jeden Impuls des Kamms $R_1$ wird eine zentrierte Kopie von $R_2$ gelegt. Wir erhalten ein unendliches Impulsbett in der $(u,v)$-Ebene.
+Wir können folgendes festhalten:
+
+1. Der Frequenzvektor des $(m,n)$-ten Impulses des resultierenden Spektrums ist die Vektorsumme der Frequenzvektoren des $m$-ten Impulses des ersten Kamms und des $n$-ten Impulses des zweiten Kamms.
+2. Die Amplitude des $(m,n)$-ten Impulses ist das Produkt des $m$-ten Impulses des ersten Kamms mit dem $n$-ten Impuls des zweiten Kamms:
+$$a_{m,n}=a^{(1)}_ma^{(2)}_n$$.
+Diese ganze nervige Mathematik führt immerhin zu zwei interessanten Erkenntnissen über Moiré-Muster:
+1. Richtung und Frequenz des Moirés hängen nur von dem Linienabstand und der Drehung der sich überlagernden Gitter ab. Die \textit{opening ratio}, die nur Einfluss auf die Koeffizienten $a^{(1)}$ und $a^{(2)}$ hat, spielt hier keine Rolle.
+2. Die Amplitude und die Wellenform des Moirés hängen allein von der \textit{opening ratio} der sich überlagernden Gitter ab. Drehungen und Änderungen dieser haben keinen Einfluss darauf.
+
+Mehr als zwei Gitter:
+Wir können dieses Konzept ohne Probleme auf $m$ Gitter ausweiten. Der Frequenzvektor jedes Impulses im resultierenden Spektrum ist dabei eine Vektorsumme von $m$ Frequenzvektoren (dabei ist zu beachten, dass diese auch dem Nullvektor entsprechen können) und die Amplitude ist das Produkt der Amplituden der involvierten Impulse. Diese Auffassung der resultierenden Impulse als Linearkombinationen der Ursprungsimpulse legt eine Benennung der auftauchenden Moirés über die "Zusammensetzung" ihrer Fundamentalimpulse nahe. Ich möchte das aber bei einer Bemerkung lassen.
+
+
+Moiré-freie  
+
+Mein Programm
+
+In  meinem Programm können Liniengitter und Raster beliebiger Breite und Strichstärke übereinandergelegt werden. Es wird dann das Spektrum ihrer Reflexionsfunktionen berechnet und dargestellt, ebenso deren Konvolution, in der dann die neuen Impulse sichbar sind. Klickt man auf einen neuen Impuls innehalb des Visibility Circles, so wird in das Bild die Richtung des Moirés eingezeichnet. 
+
+
+Ende. 
+
+
 
 \bibliography{lit}
 \bibliographystyle{alpha}
-\end{document}
+\end{document
