@@ -19,7 +19,7 @@ Abb.1: Das Hauptfenster. Im Moment sind zwei Ebenen vorhanden.
 
 
 ![Uebersicht](grafiken/uebersicht.png?raw=true "Eine Tabelle zur Übersicht über die gewählten Einstellungen")
-Abb.2: Eine Tabelle zur Übersicht über die gewählten Einstellungen
+Abb.2: Eine Tabelle zur Übersicht über die gewählten Einstellungen.
 
 ![Bildfenster](grafiken/bildfenster.png?raw=true "Das Bildfenster")
 Abb.3: Das Bildfenster.
